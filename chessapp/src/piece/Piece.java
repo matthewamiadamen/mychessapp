@@ -1,6 +1,7 @@
 package piece;
 
 import Main.Board;
+import Main.GamePanel;
 
 import java.awt.Graphics2D;
 import java.awt.image.*;
@@ -31,12 +32,9 @@ public class Piece {
         BufferedImage image = null;
 
         try{
-            System.out.println(imagePath + ".png");
             image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
-            System.out.println(imagePath + ".png");
         }catch(IOException e){
             e.printStackTrace();
-            System.out.println("image cant be loaded");
         }
         return image;
 
@@ -48,8 +46,108 @@ public class Piece {
     public int getY(int row){
         return row * Board.SQUARE_SIZE;
     }
+    public int getCol(int x){
+        return (x + Board.HALF_SQUARE_SIZE) / Board.SQUARE_SIZE;
+    }
+    public int getRow(int y){
+        return (y + Board.HALF_SQUARE_SIZE) / Board.SQUARE_SIZE;
+    }
+
+    public void updatePosition(){
+        x = getX(col);
+        y = getY(row);
+        prevCol = col;
+        prevRow = row;
+    }
+
+    public void resetPosition(){
+        col = prevCol;
+        row = prevRow;
+        x = getX(col);
+        y = getY(row);
+    }
+
+    public boolean canMove(int targetCol, int targetRow){
+        return false;
+    }
+
+    public boolean isWithinBoard(int targetCol, int targetRow){
+        return targetCol >= 0 && targetCol <= 7 && targetRow >= 0 && targetRow <= 7;
+    }
+
+    public boolean isSameSquare(int targetCol, int targetRow){
+        return targetCol == prevCol && targetRow == prevRow;
+    }
+
+    // Returns the piece at the target square, or null if empty
+    public Piece hittingPiece(int targetCol, int targetRow){
+        for(Piece piece : GamePanel.simPieces){
+            if(piece.col == targetCol && piece.row == targetRow && piece != this){
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    // Check if target square is valid (not occupied by same color piece)
+    public boolean isValidSquare(int targetCol, int targetRow){
+        Piece hittingP = hittingPiece(targetCol, targetRow);
+        if(hittingP == null){
+            return true; // empty square
+        }
+        else{
+            if(hittingP.color != this.color){
+                return true; // can capture
+            }
+            else{
+                return false; // blocked by own piece
+            }
+        }
+    }
+
+    // Check if any piece is blocking the straight-line path
+    public boolean pieceIsOnStraightLine(int targetCol, int targetRow){
+        // Moving left or right
+        if(targetRow == prevRow){
+            int step = (targetCol > prevCol) ? 1 : -1;
+            for(int c = prevCol + step; c != targetCol; c += step){
+                if(hittingPiece(c, prevRow) != null){
+                    return true;
+                }
+            }
+        }
+        // Moving up or down
+        if(targetCol == prevCol){
+            int step = (targetRow > prevRow) ? 1 : -1;
+            for(int r = prevRow + step; r != targetRow; r += step){
+                if(hittingPiece(prevCol, r) != null){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Check if any piece is blocking the diagonal path
+    public boolean pieceIsOnDiagonalLine(int targetCol, int targetRow){
+        if(Math.abs(targetCol - prevCol) == Math.abs(targetRow - prevRow)){
+            int colStep = (targetCol > prevCol) ? 1 : -1;
+            int rowStep = (targetRow > prevRow) ? 1 : -1;
+            int c = prevCol + colStep;
+            int r = prevRow + rowStep;
+            while(c != targetCol && r != targetRow){
+                if(hittingPiece(c, r) != null){
+                    return true;
+                }
+                c += colStep;
+                r += rowStep;
+            }
+        }
+        return false;
+    }
 
     public void draw(Graphics2D g2){
         g2.drawImage(image, x, y, Board.SQUARE_SIZE, Board.SQUARE_SIZE, null);
     }
 }
+

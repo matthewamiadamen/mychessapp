@@ -15,4 +15,14 @@ public class Bishop extends Piece{
         }
     }
 
-}
+    public boolean canMove(int targetCol, int targetRow){
+        if(isWithinBoard(targetCol, targetRow) && !isSameSquare(targetCol, targetRow)){
+            if(Math.abs(targetCol - prevCol) == Math.abs(targetRow - prevRow)){
+                if(isValidSquare(targetCol, targetRow) && !pieceIsOnDiagonalLine(targetCol, targetRow)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}

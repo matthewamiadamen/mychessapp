@@ -15,4 +15,14 @@ public class Rook extends Piece{
         }
     }
 
-}
+    public boolean canMove(int targetCol, int targetRow){
+        if(isWithinBoard(targetCol, targetRow) && !isSameSquare(targetCol, targetRow)){
+            if(targetCol == prevCol || targetRow == prevRow){
+                if(isValidSquare(targetCol, targetRow) && !pieceIsOnStraightLine(targetCol, targetRow)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}

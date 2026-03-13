@@ -15,4 +15,17 @@ public class Knight extends Piece{
         }
     }
 
-}
+    public boolean canMove(int targetCol, int targetRow){
+        if(isWithinBoard(targetCol, targetRow)){
+            // L-shape: 2 squares in one direction, 1 in the other
+            int colDiff = Math.abs(targetCol - prevCol);
+            int rowDiff = Math.abs(targetRow - prevRow);
+            if((colDiff == 2 && rowDiff == 1) || (colDiff == 1 && rowDiff == 2)){
+                if(isValidSquare(targetCol, targetRow)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
