@@ -129,6 +129,13 @@ public class GamePanel extends JPanel implements Runnable{
                 repaint(); // calls paint component
                 delta --;
             }
+            try{
+                // Yield in browser runtimes so Swing/AWT can process paint events.
+                Thread.sleep(1);
+            } catch(InterruptedException e){
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
     }
 

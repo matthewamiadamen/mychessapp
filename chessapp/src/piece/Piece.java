@@ -3,9 +3,11 @@ package piece;
 import Main.Board;
 import Main.GamePanel;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.*;
 import java.io.IOException;
+import java.io.InputStream;
 import javax.imageio.*;
 
 public class Piece {
@@ -29,15 +31,28 @@ public class Piece {
     //buffer image
     public BufferedImage getImage(String imagePath){
 
-        BufferedImage image = null;
+        final String fullPath = imagePath + ".png";
 
-        try{
-            image = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
+        try(InputStream imageStream = getClass().getResourceAsStream(fullPath)){
+            if(imageStream == null){
+                System.err.println("Missing image resource: " + fullPath);
+                return createFallbackImage();
+            }
+            return ImageIO.read(imageStream);
         }catch(IOException e){
+            System.err.println("Failed to load image resource: " + fullPath);
             e.printStackTrace();
+            return createFallbackImage();
         }
-        return image;
+    }
 
+    private BufferedImage createFallbackImage(){
+        BufferedImage fallback = new BufferedImage(Board.SQUARE_SIZE, Board.SQUARE_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = fallback.createGraphics();
+        g2.setColor(Color.MAGENTA);
+        g2.fillRect(0, 0, Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+        g2.dispose();
+        return fallback;
     }
 
     public int getX(int col){

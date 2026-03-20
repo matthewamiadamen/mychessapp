@@ -13,10 +13,21 @@
         background: #101217;
         color: #f5f7ff;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      .page {
-        min-height: 100vh;
+      <script>
+        (async function () {
+          try {
+            await cheerpjInit();
+            cheerpjCreateDisplay(-1, -1, document.getElementById("display"));
+            await cheerpjRunJar("/mychessapp.jar");
+          } catch (err) {
+            const box = document.getElementById("display");
+            box.innerHTML =
+              '<pre style="padding:16px;color:#fff;background:#900;white-space:pre-wrap;">CheerpJ failed to start:\n' +
+              String(err) +
+              "</pre>";
+            console.error(err);
+          }
+        })();
         display: grid;
         grid-template-rows: auto 1fr;
       }
